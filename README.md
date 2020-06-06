@@ -16,6 +16,6 @@ both in which calcium waves are initiated by target stimuli and propagate via di
 
 ### Dependencies:
 1. MOLE Library: https://github.com/jcorbino/mole
-  -- Download and install MOLE (Refer MOLE documentation https://github.com/jcorbino/mole/blob/master/MOLE%20User's%20Manual%20(MATLAB%20version).pdf)
+  -- Download and install MOLE (Refer MOLE documentation.
   -- We use MOLE for numerical simulations.
-2. MATLAB
+2. MATLAB (any stable version, we suggest R2017A)
