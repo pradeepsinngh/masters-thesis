@@ -9,10 +9,24 @@ Accordingly, we have proposed two models that could be the biological substrate 
 
 both in which calcium waves are initiated by target stimuli and propagate via diffusion with the participation of regenerative mechanisms
 
+### Structure: 
+```bash
+├── model
+│   ├── SD_rates.mat
+│   ├── genrate.m
+│   ├── simulate.m
+│   ├── plot_Ca.m
+│   ├── wavefront_speed.m
+└── 
+```
+
 ### Usage:
-
-
-
+- Step 0: Make sure you have ```SD_rates.mat``` is in your current directory.
+- Step 1: Run ```genrate_str.m```.
+  - This will create 
+- Step 2: Run ```simulate.m``` 
+- Step 3: Run ```plot_Ca.m``` 
+- Step 4: Run ```wavefront_speed.m``` 
 
 ### Dependencies:
 1. MOLE Library: https://github.com/jcorbino/mole
