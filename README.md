@@ -21,12 +21,18 @@ both in which calcium waves are initiated by target stimuli and propagate via di
 ```
 
 ### Usage:
-- Step 0: Make sure you have ```SD_rates.mat``` is in your current directory.
+- Step 0: Run ```kinetic_rates_SD.m``
+  - This will create ```SD_rates.mat``` file, make sure that is present in your current directory.
 - Step 1: Run ```genrate_str.m```.
-  - This will create 
+  - This will create ```Data_files.mat```, that will store positions (cordinates) for all compartments in all cells.
 - Step 2: Run ```simulate.m``` 
+  - This will create ```Ca_store.mat```, that will hold Ca history for all cells for all time setps.
 - Step 3: Run ```plot_Ca.m``` 
+  - This script will visualize (plot) the calcium waves in network. You can also store this visualization as video.
 - Step 4: Run ```wavefront_speed.m``` 
+  - Computes average wavefront speed in a network.
+  
+NOTE: All files should be in the same directory to work probably. 
 
 ### Dependencies:
 1. MOLE Library: https://github.com/jcorbino/mole
