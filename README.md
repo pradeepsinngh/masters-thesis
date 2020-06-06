@@ -6,7 +6,7 @@
 ```bash
 ├── model
 │   ├── SD_rates.mat
-│   ├── genrate.m
+│   ├── genrate_cells.m
 │   ├── simulate.m
 │   ├── plot_Ca.m
 │   ├── wavefront_speed.m
@@ -14,12 +14,12 @@
 ```
 
 ### Usage:
-- Step 0: Run ```kinetic_rates_SD.m``
+- Step 0: Run ```kinetic_rates_SD.m```
   - This will create ```SD_rates.mat``` file, make sure that is present in your current directory.
-- Step 1: Run ```genrate_str.m```.
-  - This will create ```Data_files.mat```, that will store positions (cordinates) for all compartments in all cells.
+- Step 1: Run ```genrate_cells.m```.
+  - This will create ```Data_files.mat``` file, that will store positions (cordinates) for all compartments in all cells.
 - Step 2: Run ```simulate.m``` 
-  - This will create ```Ca_store.mat```, that will hold Ca history for all cells for all time setps.
+  - This will create ```Ca_store.mat``` file, that will hold Ca history for all cells for all time setps.
 - Step 3: Run ```plot_Ca.m``` 
   - This script will visualize (plot) the calcium waves in network. You can also store this visualization as video.
 - Step 4: Run ```wavefront_speed.m``` 
