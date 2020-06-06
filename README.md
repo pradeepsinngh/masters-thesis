@@ -1,4 +1,5 @@
-# Codebase for MS Thesis: Models for propagating facilitation in the Insect Visual System.
+## Codebase for MS Thesis: 
+### Title: Models for propagating facilitation in the Insect Visual System.
 
 
 ### Structure: 
