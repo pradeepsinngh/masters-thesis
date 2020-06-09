@@ -9,7 +9,7 @@ dt = 5E-5;   % time step for temporal integration
 
 % Ca diffusion parameters
 DCa = 240; % Ca diffusion coefficient (units um^2.s^-1)
-fCa = 1; % fraction to reduce DCa due to intracellular crowding
+%fCa = 0.3; % fraction to reduce DCa due to intracellular crowding
 
 % Calcium 1st-order (Na exchange) pump constants EFFLUX
 kp1 = 75; % units uM.s^-1
@@ -31,11 +31,19 @@ rkB = kBpos/kBneg;   % ratio of rate constants (for computational use)
 kCneg = 0.1;      % units s^-1
 kCpos = 1.75;     % units s^-1
 % RyR channel flow rate parameter
-rCa = 6;          % units 
+%rCa = 6;          % units 
 
 % rates for calcium buffering (with CalB0=40, gives 5/7 buffered @ equil.)
-kcbf = 0.7; % units s^-1.uM^-1 (multiplies [Ca] & [CalB])
-kcbb = 0.1;  % units s^-1 (multiplies [CaCalB])
+%kcbf = 0.7; % units s^-1.uM^-1 (multiplies [Ca] & [CalB])
+%kcbb = 10; %0.1;  % units s^-1 (multiplies [CaCalB])
+
+% -----------
+fCa = 0.6;
+rCa = 5;
+kcbf = 0.7;
+kcbb = 10; 
+
+% ----------
 
 CalB0 = 40; % available Calbindin conc. (uM)   (btot in Breit-Queisser)
 
@@ -81,7 +89,7 @@ m1 = round(0.4*ng);
 m2 = m1+1;
 m3 = m2+1;
 
-dx = 0.25; % center-to-center spacing of grid compartments (um)
+dx = 1; % center-to-center spacing of grid compartments (um)
 
 dB = 1/12; % scaling factor for Ca fluxes into cell body
 
@@ -131,16 +139,16 @@ Cet = [];
 
 Csmax = 0; % to keep track of spatial max Cs
 
-tend = 0.1; % end time
+tend = 0.4; % end time
 for t = 0:dt:tend % loop on time
     
     % set up figure for cytosolic Ca
-    figure(3)
+    figure(3)    
     plot(xgrid1,Cs(:,1))
     xlabel('Distance (uM)');
     ylabel('Concentration (uM)');
     set(gca,'fontsize',15);
-    xlim([0 20]);
+    xlim([0 80]);
     ylim([0 10]);
     grid on
 %     % set up figure for ER Ca
