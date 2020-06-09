@@ -1,7 +1,6 @@
 %% Compute time-domain response of a compartment with ER + RYR's
 
 addpath('../Matlab/mole-master/mole_MATLAB') % path of mole library
-%addpath('/Users/pshoemaker/Desktop/MOLE/mole_MATLAB');
 
 dt = 5E-5;   % time step for temporal integration
 
@@ -9,7 +8,7 @@ dt = 5E-5;   % time step for temporal integration
 
 % Ca diffusion parameters
 DCa = 240; % Ca diffusion coefficient (units um^2.s^-1)
-%fCa = 0.3; % fraction to reduce DCa due to intracellular crowding
+fCa = 1; % fraction to reduce DCa due to intracellular crowding
 
 % Calcium 1st-order (Na exchange) pump constants EFFLUX
 kp1 = 75; % units uM.s^-1
@@ -31,24 +30,15 @@ rkB = kBpos/kBneg;   % ratio of rate constants (for computational use)
 kCneg = 0.1;      % units s^-1
 kCpos = 1.75;     % units s^-1
 % RyR channel flow rate parameter
-%rCa = 6;          % units 
+rCa = 5;          % units 
 
 % rates for calcium buffering (with CalB0=40, gives 5/7 buffered @ equil.)
-%kcbf = 0.7; % units s^-1.uM^-1 (multiplies [Ca] & [CalB])
-%kcbb = 10; %0.1;  % units s^-1 (multiplies [CaCalB])
+kcbf = 0.7; % units s^-1.uM^-1 (multiplies [Ca] & [CalB])
+kcbb = 10; %0.1;  % units s^-1 (multiplies [CaCalB])
 
-% -----------
-fCa = 0.6;
-rCa = 5;
-kcbf = 0.7;
-kcbb = 10; 
-
-% ----------
 
 CalB0 = 40; % available Calbindin conc. (uM)   (btot in Breit-Queisser)
-
 VolR = 50; % cytosol/ER volume ratio
-
 CB = 1.2; % Cs threshold (uM) to change computational method for RyR states
 
 %% Scale all rate constants by dt for purposes of temporal integration
@@ -105,7 +95,7 @@ clear LN;
 
 %% Set up initial conditions and history arrays
 
-load equilibrium_state_v1.mat; % quiescent equilibrium initial conditions
+load equilibrium_state.mat; % quiescent equilibrium initial conditions
 
 % set proximal initial condition: [Ca] = quiescent value
 Cb = Cs;
@@ -151,15 +141,6 @@ for t = 0:dt:tend % loop on time
     xlim([0 80]);
     ylim([0 10]);
     grid on
-%     % set up figure for ER Ca
-%     figure(4)
-%     plot(xgrid1,Ce(:,1))
-%     xlabel('Distance (uM)');
-%     ylabel('Concentration (uM)');
-%     set(gca,'fontsize',15);
-%     xlim([0 20]);
-%     ylim([0 300]);
-%     grid on
     pause(0.001);
 
     % Compute Ca wave propagation speed
@@ -195,7 +176,7 @@ for t = 0:dt:tend % loop on time
     Cs(end,1) = Cb; % boundary condition (proximal end)
     % lateral diffusion, ER Ca
     Ce = Ce + DCa*L2*Ce;
-%    % boundary conditions
+   % boundary conditions
     Ce(1,1) = BN2*Ce(2:end,1); % grad(Ce) (i.e. flux) = 0, distal end
     Ce(end,1) = BN2*Ce(end-1:-1:1,1); % grad(Ce) = 0, proximal end
     

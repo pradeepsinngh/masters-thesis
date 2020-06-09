@@ -90,4 +90,4 @@ figure(2);
 plot(t,Cet)
 grid on;
 
-save('equilibrium_state_v1.mat','Cs','Ce','C1','C2','O1','O2')
+save('equilibrium_state.mat','Cs','Ce','C1','C2','O1','O2')
