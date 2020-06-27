@@ -24,10 +24,8 @@ fInP3 = 1.0; % fraction to reduce DInP3 due to intracellular crowding
 kd1f = 5;
 % for conversion of InP3 back into PIP2
 k1b = 2.5;
-
 % for inhibition of InP3 production by PKC
 ki2 = 0.0943; % units uM^-1 (multiplies [PKC*])  (k2 in Kang-Othmer)
-
 % for activation of PKC
 k4f = 0.6; % units s^-1.uM^-1 (multiplies [Ca])  (k4 in Kang-Othmer)
 % for deactivation of PKC*   (k5 in Kang-Othmer)
@@ -35,7 +33,6 @@ k4b = 0.5; % units s^-1
 
 % Calcium infux rate constant for open InP3R channels
 kCa = 500;  % units uM.s^-1 (multiplies effective open-channel fraction)
-%kCa = 170;  % units uM.s^-1 (multiplies effective open-channel fraction)
 
 % Calcium influx rate for open ARC channels
 kaa = 5;  % units uM.s^-1

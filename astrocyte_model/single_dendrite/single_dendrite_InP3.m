@@ -1,5 +1,5 @@
 %% Compute and store states for two dendrites coupled to a cell body
-%% this version includes the reaction InP3 -> AA -> (uptake)
+% this version includes the reaction InP3 -> AA -> (uptake)
 
 addpath('../Matlab/mole-master/mole_MATLAB') % path of mole library
 %addpath('/Users/pshoemaker/Desktop/MOLE/mole_MATLAB');
@@ -12,18 +12,17 @@ nstates = 9; % number of relevant state variables
 
 %% Rate & related constants
 
-% rate of InP3 production induced by glutamatergic input
+% % rate of InP3 production induced by glutamatergic input
 kGI = 40; % units uM.s^-1
 
 DCa = 240; % Ca diffusion coefficient (units um^2.s^-1)
 fCa = 0.3; % fraction to reduce DCa due to intracellular crowding
 DInP3 = 300; % InP3 diffusion coefficient (units um^2.s^-1)
-%%%% fInP3 set to zero => no InP3 diffusion %%%%
 fInP3 = 0.7; % fraction to reduce DInP3 due to intracellular crowding
 
-% for [Ca]-dependent production of InP3
+% % for [Ca]-dependent production of InP3
 kd1f = 6;
-% for conversion of InP3 into AA (and thence back into PIP2)
+% for conversion of InP3 into AA (and then back into PIP2)
 k1b = 2.5;
 
 % for inhibition of InP3 production by PKC
@@ -34,13 +33,10 @@ k4f = 0.6; % units s^-1.uM^-1 (multiplies [Ca])  (k4 in Kang-Othmer)
 % for deactivation of PKC*    (k5 in Kang-Othmer)
 k4b = 0.5; % units s^-1 
 
-% Calcium infux rate constant for open InP3R channels
-kCa = 600;   % units uM.s^-1 (multiplies effective open-channel fraction)
-%kCa = 170;  % units uM.s^-1 (multiplies effective open-channel fraction)
-
-% Calcium influx rate for open ARC channels
+% % Calcium infux rate constant for open InP3R channels
+kCa = 500;  % units uM.s^-1 (multiplies effective open-channel fraction) 
+% % Calcium influx rate for open ARC channels
 kaa = 6;  % units uM.s^-1
-
 % Calcium 1st-order pump constants
 kp1 = 75; % units uM.s^-1
 kpc1 = 1.8; % units uM
@@ -51,6 +47,8 @@ kpc2sq = kpc2^2;
 
 % leakage rate
 Klk = 1; % units uM.s^-1
+
+%% -----------------------------------------
 
 % rates for calcium buffering (with CalB0=40, gives 5/7 buffered @ equil.)
 kcbf = 0.7; % units s^-1.uM^-1 (multiplies [Ca] & [CalB])
@@ -129,7 +127,7 @@ m = 100; % number of grid compartments; 2*k+1 = min to support O(2) accuracy
 m0 = round(m/5); % # grid compartments to set initial non-0 [Ca] levels
 
 % location markers for Ca wave computations
-m1 = round(0.6*m);
+m1 = round(0.4*m);
 m2 = m1+1;
 m3 = m2+1;
 
@@ -364,3 +362,4 @@ end
 %for nn=1:8
 %    ICX(nn) = STATES{1,1,nn};
 %end
+

@@ -6,6 +6,8 @@ addpath('../Matlab/mole-master/mole_MATLAB') % path of mole library
 %addpath('/Users/pshoemaker/Desktop/MOLE/mole_MATLAB');
 
 dt = 5E-4;   % time step for temporal integration
+tend = 5; % end time ( t(start) = 0)
+itend = floor(tend/dt)+1;
 
 ncells = 2;  % single cell terminating dendrite
 nmorphs = 2; % no branched dendrites, so we only have morph 1 and morp 2
@@ -14,7 +16,8 @@ nstates = 9; % number of relevant state variables
 %% Rate & related constants
 
 % rate of InP3 production induced by glutamatergic input
-kGI = 40; % units uM.s^-1
+kGI = 100; % units uM.s^-1
+%kGI = 50; % units uM.s^-1
 
 DCa = 240; % Ca diffusion coefficient (units um^2.s^-1)
 % fCa = 1.0; % fraction to reduce DCa due to intracellular crowding
@@ -75,14 +78,14 @@ CalB0 = 40; % available Calbindin conc. (uM)   (btot in Breit-Queisser)
 
 fCa = 0.3;
 fInP3 = 0.7;
-kCa = 525;
-kaa = 5;
-kd1f = 5;
+kCa = 600;
+kaa = 6;
+kd1f = 6;
 ki2 = 0.0943;
 rinp3 = 500;
 
 
-rica = 500;
+rica =500;
 
 %% Scale all rate constants by dt for purposes of temporal integration
 
@@ -152,12 +155,12 @@ LN2 = LN(end,:);  % matrix to compute slope @ proximal end
 
 clear LN;
 
-%% Define cell arrays to hold state & input data
+%% Define cell arrays to hold state & input data & positions
 
 STATES = cell(ncells,nmorphs,nstates);
 % index 1: cell number;
 % index 2: morphological class:
-%   1 => cell body; 2 => straight dendrites; (3 => branched dendrites);
+%   1 => cell body; 2 => straight dendrites;
 % index 3: states:
 %   1 => Ca; 2 => InP3;
 %   3 => R; 4 => A; 5 => O; 6 => I2;
@@ -182,94 +185,120 @@ for n = 1:ncells
     end
 end
 
+% Storing Ca throughout the cells
+STATES_store  = cell(itend,ncells,nmorphs);
+for ii = 1:itend
+    for n = 1:ncells
+        for m = 1:nmorphs
+            if m == 1 % for cell body (morph 1)
+                STATES_store{ii,n,m} = ones(1,1);
+            else
+                STATES_store{ii,n,m} = ones(ng(m)+2,nm(m));
+            end
+        end
+    end
+end
+
 INPUTS = cell(ncells,nmorphs);
 % index 1: cell number;
 % index 2: morphological class:
 %   1 => cell body; 2 => straight dendrites; (3 => branched dendrites);
-
 for n = 1:ncells
     for m = 1:nmorphs
         if m == 1 % for cell body (morph 1)
             INPUTS{n,m} = 0;
-        else % for dendrites (morphs 2 & 3)
+        else % for dendrites (morph 2)
             INPUTS{n,m} = zeros(ng(m),nm(m));
         end
     end
 end
 
-%% Loop on time
+NGJ = 11; % compartment number for gap junction (both cells)
+NGJG = NGJ+1; % grid number for gap junction (used in STATE array)
+
+INTERCONX = [1,2,2,NGJ,2,2,1,NGJ]; % interconnection data, to contain:
+% cell #, morph #, segment (column) #, compartment #, for both cells
+
+% POSITIONS indices: cell#, morph#, x or y
+POSITIONS = cell(ncells,nmorphs,2);
+LD = ng(2)*dx;
+FS = [ 0:dx:LD ]';
+DL = 2*(LD-(NGJ-1)*dx);
+% dendrites, cell 1
+POSITIONS{1,2,1} = [ FS, 2*LD-FS ];
+POSITIONS{1,2,2} = zeros(ng(2)+1,2);
+% body, cell 1
+POSITIONS{1,1,1} = LD;
+POSITIONS{1,1,2} = 0;
+% dendrites, cell 2
+POSITIONS{2,2,1} = POSITIONS{1,2,1}+DL;
+POSITIONS{2,2,2} = zeros(ng(2)+1,2);
+% body, cell 2
+POSITIONS{2,1,1} = LD+DL;
+POSITIONS{2,1,2} = 0;
 
 % grids for plots
-xgrid1 = [0, dx/2:dx:20-dx/2, 20]';
-xgrid1b = [43, 43+dx/2:dx:63-dx/2, 63]';
+xgridLl = [ POSITIONS{1,2,1}(1:end-1,1) ]';
+xgridLr = [ POSITIONS{1,2,1}(1:end-1,2) ]';
+xgridRl = [ POSITIONS{2,2,1}(1:end-1,1) ]';
+xgridRr = [ POSITIONS{2,2,1}(1:end-1,2) ]';
 
-xgrid1r = [22, 22+dx/2:dx:42-dx/2, 42]';
-xgrid1rb = [65, 65+dx/2:dx:85-dx/2, 85]';
-
-xgrid2 = [dx/2:dx:20-dx/2]';
-xgrid2b = [dx/2:dx:62-dx/2]';
-
-Camax = 0;
-
-tend = 5; % end time ( t(start) = 0)
+%% Loop on time
+count=1;
 for t = 0:dt:tend % loop on time
     
     % set up figure
     figure(1)
-    plot(xgrid1,STATES{1,2,1}(:,1),'b')
+    
+    plot(xgridLl,STATES{1,2,1}(2:end-1,1),'b')
     hold on
-    plot(21,STATES{1,1,1},'b^')
-    plot(xgrid1,STATES{1,2,2}(:,1),'r')
-    plot(21,STATES{1,1,2}, 'r^')
-    plot(xgrid1r,flipud(STATES{1,2,1}(:,2)),'b')
-    plot(xgrid1r,flipud(STATES{1,2,2}(:,2)),'r')
+    %plot(xgridLl,STATES{1,2,2}(2:end-1,1),'r')
+    plot(POSITIONS{1,1,1},STATES{1,1,1},'b^')
+%     plot(POSITIONS{1,1,1},STATES{1,1,2}, 'r^')
+    plot(xgridLr,STATES{1,2,1}(2:end-1,2),'b')
+    %plot(xgridLr,STATES{1,2,2}(2:end-1,2),'r')
        
-    plot(xgrid1b,STATES{2,2,1}(:,1),'b')
-    hold on
-    plot(64,STATES{2,1,1},'b^')
-    plot(xgrid1b,STATES{2,2,2}(:,1),'r')
-    plot(64,STATES{2,1,2}, 'r^')
-    plot(xgrid1rb,flipud(STATES{2,2,1}(:,2)),'b')
-    plot(xgrid1rb,flipud(STATES{2,2,2}(:,2)),'r')
+    plot(xgridRl,STATES{2,2,1}(2:end-1,1),'Color',[0.4,0.4,1])
+    %plot(xgridRl,STATES{2,2,2}(2:end-1,1),'Color',[1,0.4,0.4])
+    plot(POSITIONS{2,1,1},STATES{2,1,1},...
+        'Marker','^','MarkerEdgeColor',[0.4,0.4,1])
+%     plot(POSITIONS{2,1,1},STATES{2,1,2},...
+%         'Marker','^','MarkerEdgeColor',[1,0.4,0.4])
+    plot(xgridRr,STATES{2,2,1}(2:end-1,2),'Color',[0.4,0.4,1])
+    %plot(xgridRr,STATES{2,2,2}(2:end-1,2),'Color',[1,0.4,0.4])
+
     
     grid on
     xlabel('Distance (uM)');
     ylabel('Concentration (uM)');
     set(gca,'fontsize',15);
-    xlim([0 86]);
-    ylim([0 10]);
+    xlim([0 POSITIONS{2,2,1}(1,2)]);
+    ylim([0 5]);
     hold off
 
     % ------------------------------------------------
     % Interconnection between cells [Gap junctions]
     
     % transmission of InP3 through Gap junctions
-    IC1 = STATES{1,2,2}(2,2); % end of 1st cell on the right side of Cell body
-    IC2 = STATES{2,2,2}(2,1); % end of 2nd cell on the left side of Cell body
+    IC1 = STATES{1,2,2}(NGJG,2); % [Ca] in compartment in cell 1
+    IC2 = STATES{2,2,2}(NGJG,1); % [Ca] in compartment in cell 2
     flow = rinp3 * (IC1 - IC2);
-    STATES{1,2,2}(2,2) = STATES{1,2,2}(2,2) - flow;
-    STATES{2,2,2}(2,1) = STATES{2,2,2}(2,1) + flow;
-
-   % transmission of Ca through Gap junctions
-%     IC1 = STATES{1,2,1}(2,2);
-%     IC2 = STATES{2,2,1}(2,1);
-%     flow = rica * (IC1 - IC2);
-%     STATES{1,2,1}(2,2) = STATES{1,2,1}(2,2) - flow;
-%     STATES{2,2,1}(2,1) = STATES{2,2,1}(2,1) + flow;
+    STATES{1,2,2}(NGJG,2) = STATES{1,2,2}(NGJG,2) - flow;
+    STATES{2,2,2}(NGJG,1) = STATES{2,2,2}(NGJG,1) + flow;
 
     % ------------------------------------------------
     
     % set up inputs: G-protein pulse in 1st 4 compartments of dendrite 1
     if t<0.1 % 100ms long
         INPUTS{1,2}(1,1) = kGI;
-        INPUTS{1,2}(2,1) = kGI;
-        INPUTS{1,2}(3,1) = kGI;
-        INPUTS{1,2}(4,1) = kGI;
+%         INPUTS{1,2}(2,1) = kGI;
+%         INPUTS{1,2}(3,1) = kGI;
+%         INPUTS{1,2}(4,1) = kGI;
     else
         INPUTS{1,2}(1,1) = 0;
-        INPUTS{1,2}(2,1) = 0;
-        INPUTS{1,2}(3,1) = 0;
-        INPUTS{1,2}(4,1) = 0;
+%         INPUTS{1,2}(2,1) = 0;
+%         INPUTS{1,2}(3,1) = 0;
+%         INPUTS{1,2}(4,1) = 0;
     end
 
     % Following: loops for state updates in individual cells & morphs
@@ -393,11 +422,14 @@ for t = 0:dt:tend % loop on time
             STATES{n,m,8} = CaCalB;
             STATES{n,m,9} = PKCv;
             
+            
+            STATES_store{count,n,m} = STATES{n,m,1};
+            
         end
     end
     pause(0.0002)
+    count = count+1;
 end
 
-for nn=1:8
-    ICX(nn) = STATES{1,1,nn};
-end
+save('Ca_store.mat','STATES_store','-v7.3');
+save('Data_files.mat','POSITIONS','INTERCONX');

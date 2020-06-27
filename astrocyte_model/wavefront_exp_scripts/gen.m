@@ -10,7 +10,7 @@
 
 % astrocyte array size parameters
 XE = 3; % X extent of array (number of columns of cells)
-YE = 5; % Y extent of array (number of rows of cells)
+YE = 3; % Y extent of array (number of rows of cells)
 NG = XE*YE; % total number of astrocytes;
 
 % astrocyte morphology parameters: model-dependent!

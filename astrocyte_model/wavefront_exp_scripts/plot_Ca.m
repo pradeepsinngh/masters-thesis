@@ -9,12 +9,6 @@ load('Data_files');
 itend = length(STATES_store);
 ncells = XE*YE;
 
-% % create the video writer with 1 fps
-video_79 = VideoWriter('video.avi');
-video_79.FrameRate = 30;
-% % open the video writer
-open(video_79);
-
 % setup scale
 XS = [];
 YS = [];
@@ -48,17 +42,15 @@ figure(3);
 axis([0 XMAX -5 YMAX]);
 hold on
 
-ax = gca();   % for making video
-
 tic % timer to cal elapsed time
 
-for ii=1:2000 %itend
+for ii=1:itend
     for n=1:ncells
         for m=1:nmorphs
             
             % following plots astrocyte skeleton, colored according to [Ca]
             % COLOR contains a 64 x 3 colormap.
-            Camax = 12;
+            Camax = 9;
             COLOR = colormap;
             
             Ca = STATES_store{ii,n,m};
@@ -91,16 +83,9 @@ for ii=1:2000 %itend
                     end
                 end
                 pause(.00002)
-                % For making video
-                frame = getframe(ax);
-                frame.cdata = imresize(frame.cdata,[560, 420]);
-                writeVideo(video_79,frame);
             end
         end
     end
 end
-
-%close the writer object
-close(video_79);
 
 toc % end timer here

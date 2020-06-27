@@ -14,7 +14,6 @@ load('Data_files.mat');
 NN = size(POSITIONS);
 ncells = NN(1); 
 
-
 nmorphs = 3; % number of different component morphologies in cell $$$$$
 nstates = 9; % number of relevant state variables
 
@@ -31,7 +30,7 @@ Xstim = 2;          % x-location of stimulus in 3x3 array
 % Rate & related constants:
 
 % rate of InP3 production induced by glutamatergic input
-% kGI = 100;
+kGI = 100;
 
 DCa = 240;   % Ca diffusion coefficient (units um^2.s^-1)
 fCa = 0.3;   % fraction to reduce DCa due to intracellular crowding
@@ -40,19 +39,19 @@ DInP3 = 300; % InP3 diffusion coefficient (units um^2.s^-1)
 fInP3 = 0.7; % fraction to reduce DInP3 due to intracellular crowding
 
 % for [Ca]-dependent production of InP3
-% kd1f = 6;
+kd1f = 6;
 % for conversion of InP3 into AA (and thence back into PIP2)
 k1b = 2.5;
 % for inhibition of InP3 production by PKC
-% ki2 = 0.0943; % units uM^-1 (multiplies [PKC*])  (k2 in Kang-Othmer)
+ki2 = 0.0943; % units uM^-1 (multiplies [PKC*])  (k2 in Kang-Othmer)
 % for activation of PKC
 k4f = 0.6;    % units s^-1.uM^-1 (multiplies [Ca])    (k4 in Kang-Othmer)
 % for deactivation of PKC*    (k5 in Kang-Othmer)
 k4b = 0.5;    % units s^-1 
 % Calcium infux rate constant for open InP3R channels
-% kCa = 500;    % units uM.s^-1 (multiplies effective open-channel fraction)
+kCa = 500;    % units uM.s^-1 (multiplies effective open-channel fraction)
 % Calcium influx rate for open ARC channels
-% kaa = 5;      % units uM.s^-1
+kaa = 5;      % units uM.s^-1
 % Calcium 1st-order pump constants
 kp1 = 75;     % units uM.s^-1
 kpc1 = 1.8;   % units uM
@@ -62,14 +61,14 @@ kpc2 = 0.10;  % units uM
 kpc2sq = kpc2^2;
 
 % rate constant at interconnections
-% rinp3 = 500;
+rinp3 = 500;
 
 % leakage rate
 Klk = 1;      % units uM.s^-1
 
 % rates for calcium buffering (with CalB0=40, gives 5/7 buffered @ equil.)
-% kcbf = 0.7;   % units s^-1.uM^-1 (multiplies [Ca] & [CalB])
-% kcbb = 10;    % units s^-1 (multiplies [CaCalB])
+kcbf = 0.7;   % units s^-1.uM^-1 (multiplies [Ca] & [CalB])
+kcbb = 10;    % units s^-1 (multiplies [CaCalB])
 
 % relative dependence of open probablity on O and A states
 fO = 0.1;
@@ -77,23 +76,6 @@ fA = 0.9;
 
 PKC0 = 1.0;   % available PKC concentration (uM)   (KT in Kang-Othmer)
 CalB0 = 40;   % available Calbindin conc. (uM)   (btot in Breit-Queisser)
-
-
-
-%% ------------------------------------------------------------
-
-% local effect
-kGI = 400;
-kaa = 6;
-rinp3 = 500; %5000
-
-% global effect
-kd1f = 6; %6
-kCa = 600; % 600
-
-kcbf = 0.7;
-kcbb = 10;
-ki2 = 0.0943;
 
 %% ------------------------------------------------------------
 % Scale all rate constants by dt for purposes of temporal integration
@@ -158,7 +140,6 @@ ng(3) = NN(2)-1; % number of morph #3 (branched dendrite segments) per cell
 ns = 3; % number of dendritic compartments per branched dendrite
 
 dx = 1; % center-to-center spacing of grid compartments (um)
-
 dB = 1/12; % scaling factor for Ca fluxes into cell body
 
 %% ----------------------------------------------------
@@ -252,27 +233,6 @@ NC = ceil(ncells/2);
 NM = 1; % morph number
 NG = 1; % grid number
 NI = 1; % instance of morph
-
-%% ----------------------------------------------------
-
-% % To store Ca and InP3 history for two compartments.
-% 
-% % Compartment 1 = Cell 3, SD 5, Comp 1
-% % Compartment 2 = Cell 1, BD 2, Comp 3
-% 
-% % column 1: dt (time step)
-% % column 2: Ca (for comp 1)
-% % column 3: Ca (for comp 2)
-% % column 4: InP3 (for comp 1)
-% % column 5: InP3 (for comp 2)
-% 
-% % store all states for two compartments
-% All_STATES = zeros(itend,4,nstates);
-% 
-% % store AA/ InP3 states for cell 1 compartment 
-% AA_STATES = zeros(itend,5);
-% 
-% InP3_STATES = zeros(itend,2,7);
 
 %% ----------------------------------------------------
 % INPUTS = cell(ncells,nmorphs);
